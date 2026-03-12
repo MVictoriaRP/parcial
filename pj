@@ -1,4 +1,5 @@
-#JOEL NIÑO
+#linea 152 lo de copilot
+# JOEL NIÑO
 #from sklearn.compose import ColumnTransformer
 #from sklearn.discriminant_analysis import StandardScaler
 #from sklearn.pipeline import Pipeline
@@ -11,10 +12,11 @@
 #from sklearn.impute import SimpleImputer
 #from sklearn.compose import ColumnTransformer
 #df = pd.read_csv('lifestyle weight tracker.csv')
+
 #[10%] Entendimiento del negocio y enfoque analítico:
-#[3%] Describa el objetivo de negocio que tiene la empresa donde ve
-#oportunidades de aplicar aprendizaje automático. Justifique la razón
+#[3%] Describa el objetivo de negocio que tiene la empresa donde ve oportunidades de aplicar aprendizaje automático. Justifique la razón
 #por la cual el uso de aprendizaje automático es una opción para ellos.
+
 #HealthLifeAlpes busca mejorar la experiencia de sus usuarios ofreciendo recomendaciones
 #personalizadas sobre hábitos de vida y bienestar. La oportunidad de aplicar aprendizaje
 #automático está en predecir cómo algunas caractertíricas o hábitos de las personas como,
@@ -24,9 +26,12 @@
 #través de modelos como Lasso, podrían permtir ver las variables mas importantes (hábitos o
 #características) a la hora de estudiar la variación de peso corporal, interprentado esto se podrían
 #dar recomendaciones a usuarios más realistas y saludables.
+
+
 #[7%] Describa y justifique el enfoque analítico propuesto para abordar el objetivo de negocio
 #identificado en el punto 1a. Incluya los tipos y tareas de aprendizaje, al igual que las técnicas o
 #algoritmos de aprendizaje de máquina que propone utilizar.
+
 #Se propone un modelo supervisado, donde la variable objetivo es Weight_Change y las variables
 #explicativas son los hábitos diarios registrados. La tarea principal es regresión, ya que se busca
 #estimar un número. Se pueden aplicar algoritmos como regresión lineal regularizada. En este
@@ -36,10 +41,13 @@
 #importantes y aquellas que fueron llevadas a cero, permiten complir con el objetivo de mejorar
 #la salud y el bienestar de los usuarios. Se deben explorar los datos y limpiarlos, luego ya
 #empezar a probar modelos e hiperparámetros
+
+
 #[10%] Realice el análisis exploratorio de los datos, incluyendo la verificación de las dimensiones
 #de la calidad de los datos y la propuesta para la corrección de los errores identificados.
 #En el análisis exploratoiro de los datos encontramos las siguientes cosas en cada uno de los 4
 #atributos de calidad:
+
 #UNICIDAD:
 #Encontramos 0 valores duplicados:
 #np.int64(0)
@@ -56,6 +64,7 @@
 #y para work_type con la categoría más frecuente. De esta forma no borramos los datos nulos, y
 #además completamos los valores faltantes. Eliminar 27.552 sería muy grave, es mucho mejor
 #remplazar los faltantes con la categoría más frecuente
+
 #VALIDEZ:
 #OUTLIERS
 #Current_Weight_kg
@@ -73,6 +82,7 @@
 #CONSISTENCIA:
 #Verificamos la consistencia en todas las categorías, revisamos sus formatos y no encotramos
 #nada raro
+
 #VALORES CORRELACIONADOS
 #Analizando los varoles correlacionados con una tabla, concluímos:
 #En resumen, se recomienda eliminar Initial_Weight_kg y reducir las variables de ingesta
@@ -96,18 +106,23 @@
 #dañaran la distribución y descartar registros con valores imposibles para asegurar la validez de
 #los datos. Con estas correcciones se mejora la calidad del dataset y se garantiza que los modelos
 #posteriores trabajen con información coherente y confiable.
+
 #EXPLORACIÓN DE DATOS
+
 #UNICIDAD
 #df.duplicated().sum()
 #DEBE VERSE: np.int64(0)
+
 #COMPLETITUD
 #df.isnull().sum().sort_values(ascending=False)
 #MUESTRA RESULTADOS
+
 #CONSISTENCIA
 #df.dtypes
 #SALEN RESULTADOS
 #Revisamos los tipo object
 #EJ: df['Gender'].value_counts() -> Gender Male 26438 Female 26334 Other 2228 Name: count, dtype: int64
+
 #VALIDEZ
 #df.hist(bins=30, figsize=(15, 10))
 #plt.show()
@@ -134,7 +149,9 @@
 #SALEN COLS
 
 #COSAS ENCONTRADAS
+
 #PONER LO QUE LE SALGA A COPILOT PARA QUE DIGA COLUMNAS CON VALORES FALTANTES, VALORES NEGATIVOS, ETC... (exploracion de datos)
+
 #EJ: cols_negativos = ["Temp_C", "Fat_g", "Carbs_g", "Protein_g", "Calories_Consumed"]
 #conteo_negativos = {}
 #for col in cols_negativos:
