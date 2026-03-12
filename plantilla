@@ -1,0 +1,221 @@
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, FunctionTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.compose import ColumnTransformer
+
+# CARGAR DATASET
+
+df = pd.read_csv('lifestyle weight tracker.csv')
+# Si el dataset tuviera otro nombre de archivo sería algo como:
+# df = pd.read_csv('nombre_dataset.csv')
+
+
+# EXPLORACIÓN DE DATOS
+
+# Ver duplicados
+df.duplicated().sum()
+
+# Si el enunciado pide eliminar duplicados:
+# df = df.drop_duplicates()
+
+
+# REVISIÓN DE VALORES NULOS
+# Permite ver completitud de datos
+
+df.isnull().sum().sort_values(ascending=False)
+
+# Si el dataset cambia, este código sigue funcionando igual porque revisa todas las columnas automáticamente.
+
+# REVISIÓN DE TIPOS DE DATOS
+# Permite identificar variables numéricas (int64, float64) y categóricas(object, category, bool)
+
+df.dtypes
+
+# Esto ayuda a saber: cuáles deben escalarse (StandardScaler-numericas), cuáles deben codificarse (OneHotEncoding- categoricas)
+
+
+# EXPLORAR VARIABLES CATEGÓRICAS
+
+df['Gender'].value_counts()
+df['Workout_Type'].value_counts()
+
+# Si el dataset cambia, reemplaza por las variables categóricas del nuevo dataset
+# por ejemplo: df['categoria'].value_counts()
+
+
+# VISUALIZACIÓN DE VARIABLES
+
+# Histogramas para analizar distribución de variables numéricas
+df.hist(bins=30, figsize=(15,10))
+plt.show()
+
+# Boxplot para detectar outliers
+df.boxplot()
+
+
+# ESTADÍSTICAS DESCRIPTIVAS
+
+df.describe()
+
+# Esto permite identificar: valores mínimos, valores máximos(muy exagerado es outlier) ,posibles outliers, rangos de variables
+
+# DETECCIÓN DE OUTLIERS: No obligatorio
+
+# calcular percentil 99
+p99 = df["Current_Weight_kg"].quantile(0.99)
+
+# ver valor máximo
+df["Current_Weight_kg"].max()
+
+# MANEJO DE OUTLIERS: No obligatorio
+
+# eliminar valores mayores al percentil 99
+df = df[df["Current_Weight_kg"] <= p99]
+
+# IDENTIFICAR VARIABLES NUMÉRICAS Y CATEGÓRICAS
+
+numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+categorical_cols = df.select_dtypes(exclude=[np.number]).columns.tolist()
+
+# Si el dataset cambia esto funciona automáticamente.
+
+
+# REMOVER VARIABLE OBJETIVO
+# En este dataset la variable objetivo es Weight_Change
+
+if 'Weight_Change' in numeric_cols:
+    numeric_cols.remove('Weight_Change')
+
+# Si el enunciado usa otra variable objetivo cambia: 'Weight_Change' por el nombre que te den
+
+
+# ANÁLISIS DE PERCENTILES
+# Permite detectar valores extremos
+
+percentiles = [0.25, 0.50, 0.75, 0.80, 0.90, 0.95, 0.97, 0.98, 0.99]
+
+for col in numeric_cols:
+    print("---------" + col + "---------")
+    print("min:", df[col].min())
+    print("max:", df[col].max())
+    for p in percentiles:
+        print(f"{int(p*100)}%:", df[col].quantile(p))
+
+
+# ESTADÍSTICAS POR VARIABLE
+
+for col in numeric_cols:
+    print("---------"+col+"--------")
+    print(df[col].describe())
+
+
+# DETECTAR VALORES NEGATIVOS
+# En algunas variables los valores negativos no tienen sentido
+# (ej: calorías, gramos de proteína, etc.)
+
+cols_negativos = ["Temp_C", "Fat_g", "Carbs_g", "Protein_g", "Calories_Consumed"]
+
+conteo_negativos = {}
+
+for col in cols_negativos:
+    conteo_negativos[col] = (df[col] < 0).sum()
+
+for col, count in conteo_negativos.items():
+    print(f"{col}: {count} valores negativos")
+
+# Si el dataset cambia debes ajustar esta lista
+# por ejemplo si el dataset tiene:  ["Income", "Calories", "Weight"]
+
+
+# MATRIZ DE CORRELACIÓN
+
+corr = df.corr(numeric_only=True)
+
+plt.figure(figsize=(12,8))
+sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", cbar=True)
+plt.title("Matriz de correlación de variables numéricas")
+plt.show()
+
+# Esto permite detectar multicolinealidad entre variables.
+
+
+# COLUMNAS A ELIMINAR
+# Se eliminan variables altamente correlacionadas o redundantes-> mas de 0.8, de 0.3-0.7 moderada (eliminar la menos relevante)
+
+cols_to_drop = ["Initial_Weight_kg", "Protein_g", "Carbs_g", "Fat_g"]
+
+# Si el dataset cambia debes modificar esta lista según las variables correlacionadas que encuentres.
+
+
+def drop_columns(X):
+    return X.drop(columns=cols_to_drop)
+
+dropper = FunctionTransformer(drop_columns, validate=False)
+
+
+# DEFINIR VARIABLES PARA MODELO
+
+numeric_cols = [
+    "Age",
+    "Height_cm",
+    "Stress_Level",
+    "Sleep_Hours",
+    "Caffeine_mg",
+    "Calories_Consumed",
+    "Steps",
+    "Workout_Intensity",
+    "Temp_C",
+    "Current_Weight_kg"
+]
+
+categorical_cols = ["Gender","Workout_Type"]
+
+# Si el dataset cambia debes actualizar estas listas
+# con las variables numéricas y categóricas del nuevo dataset.
+
+
+# IMPUTACIÓN DE VALORES FALTANTES
+
+num_imputer = SimpleImputer(strategy="mean")
+
+# Si el enunciado pide otra estrategia puedes usar:"median", "most_frequent"
+
+cat_imputer = SimpleImputer(strategy="most_frequent")
+
+
+# PREPROCESAMIENTO
+
+preprocessor = ColumnTransformer(
+    transformers=[
+
+        ("num",
+         Pipeline([
+             ("imputer", num_imputer),
+             ("scaler", StandardScaler())
+         ]),
+         numeric_cols),
+
+        ("cat",
+         Pipeline([
+             ("imputer", cat_imputer),
+             ("onehot", OneHotEncoder(handle_unknown="ignore", drop="if_binary")),
+         ]),
+         categorical_cols)
+
+    ]
+)
+
+
+# PIPELINE FINAL
+# Este pipeline aplica todas las transformaciones automáticamente
+
+pipeline = Pipeline(steps=[
+    ("dropper", dropper),
+    ("preprocessor", preprocessor)
+])

@@ -1,0 +1,182 @@
+#JOEL NIÑO
+#from sklearn.compose import ColumnTransformer
+#from sklearn.discriminant_analysis import StandardScaler
+#from sklearn.pipeline import Pipeline
+#from sklearn.preprocessing import OneHotEncoder
+#import pandas as pd
+#import numpy as np
+#from sklearn.pipeline import Pipeline
+#from sklearn.preprocessing import StandardScaler, OneHotEncoder,
+#FunctionTransformer
+#from sklearn.impute import SimpleImputer
+#from sklearn.compose import ColumnTransformer
+#df = pd.read_csv('lifestyle weight tracker.csv')
+#[10%] Entendimiento del negocio y enfoque analítico:
+#[3%] Describa el objetivo de negocio que tiene la empresa donde ve
+#oportunidades de aplicar aprendizaje automático. Justifique la razón
+#por la cual el uso de aprendizaje automático es una opción para ellos.
+#HealthLifeAlpes busca mejorar la experiencia de sus usuarios ofreciendo recomendaciones
+#personalizadas sobre hábitos de vida y bienestar. La oportunidad de aplicar aprendizaje
+#automático está en predecir cómo algunas caractertíricas o hábitos de las personas como,
+#estrés, nutrición y ejercicio afectan la variación del peso corporal. El uso de estas técnicas es
+#adecuado porque permiten analizar grandes cantidades de datos, identificar patrones entre
+#variables y generar predicciones más precisas que otros métodos. El aprendizaje autoámtico, a
+#través de modelos como Lasso, podrían permtir ver las variables mas importantes (hábitos o
+#características) a la hora de estudiar la variación de peso corporal, interprentado esto se podrían
+#dar recomendaciones a usuarios más realistas y saludables.
+#[7%] Describa y justifique el enfoque analítico propuesto para abordar el objetivo de negocio
+#identificado en el punto 1a. Incluya los tipos y tareas de aprendizaje, al igual que las técnicas o
+#algoritmos de aprendizaje de máquina que propone utilizar.
+#Se propone un modelo supervisado, donde la variable objetivo es Weight_Change y las variables
+#explicativas son los hábitos diarios registrados. La tarea principal es regresión, ya que se busca
+#estimar un número. Se pueden aplicar algoritmos como regresión lineal regularizada. En este
+#caso, tener buena interpretabilidad de las variables, puede ser muy positivo para la empresa, por
+#lo que Lasso es una buena opción para conseguir el objetivo. Este enfoque permitirá anticipar
+#cambios en la masa corporal, la interpretabiliad final del modelo como variables mas
+#importantes y aquellas que fueron llevadas a cero, permiten complir con el objetivo de mejorar
+#la salud y el bienestar de los usuarios. Se deben explorar los datos y limpiarlos, luego ya
+#empezar a probar modelos e hiperparámetros
+#[10%] Realice el análisis exploratorio de los datos, incluyendo la verificación de las dimensiones
+#de la calidad de los datos y la propuesta para la corrección de los errores identificados.
+#En el análisis exploratoiro de los datos encontramos las siguientes cosas en cada uno de los 4
+#atributos de calidad:
+#UNICIDAD:
+#Encontramos 0 valores duplicados:
+#np.int64(0)
+#COMPLETITUD:
+#Encontramos lo siguiente:
+#VALORES NULOS
+#Workout_Type 27552 Calories_Consumed 2750
+#VALORES FALTANTES
+#Workout_Type
+#27448: Faltan 27,552 valores
+#Calories_Consumed
+#352250: Faltan 2750 valores
+#Al ser tantos valores, decidimos imputar y remplazar. Para Calorías, se remplazara con la media,
+#y para work_type con la categoría más frecuente. De esta forma no borramos los datos nulos, y
+#además completamos los valores faltantes. Eliminar 27.552 sería muy grave, es mucho mejor
+#remplazar los faltantes con la categoría más frecuente
+#VALIDEZ:
+#OUTLIERS
+#Current_Weight_kg
+#En percentiles vimos que el 99% de los datos, va hasta 159.37855999478612, pero su max es 291.842383
+#Al ser un único valor, decidimos eliminarlo
+#Las siguientes colummnas reportaron valores negativos:
+#Temp_C Fat_g Carbs_g Protein_g Calories_Consumed
+#Luego hicimos un conteno para identificar los valores negativos, y con eso decidir como corregir
+#los errores:
+#Encontramos:
+#Temp_C: 56 valores negativos Fat_g: 14 valores negativos Carbs_g: 14 valores negativos
+#Protein_g: 14 valores negativos Calories_Consumed: 14 valores negativos
+#Al ser tan pocos valores en comparación con el total de datos, decidimos eliminar sus filas para
+#evitar que añadan ruido y dañen el modelo
+#CONSISTENCIA:
+#Verificamos la consistencia en todas las categorías, revisamos sus formatos y no encotramos
+#nada raro
+#VALORES CORRELACIONADOS
+#Analizando los varoles correlacionados con una tabla, concluímos:
+#En resumen, se recomienda eliminar Initial_Weight_kg y reducir las variables de ingesta
+#nutricional a una sola representativa, quedándose con Current_Weight_kg y
+#Calories_Consumed. Esto simplifica el modelo, evita redundancia y mantiene las variables más
+#relevantes para el objetivo de predecir cambios en el peso.
+#[10%] Explique y justifique las tareas de transformación sobre los datos de acuerdo con el enfoque analítico propuesto.
+#En el análisis exploratorio se verificaron las dimensiones de calidad y se identificaron problemas
+#específicos. En unicidad no se encontraron duplicados. En completitud encontramos valores
+#nulos y valores faltantes en Workout_Type y Calories_Consumed, por lo que se decidió imputar.
+#Para calorías con la media y para Workout_Type con la categoría más frecuente, evitando una
+#pérdida grande de datos. En validez se detectaron outliers en Current_Weight_kg, con un valor
+#extremo de 291 kg frente a un percentil 99 de 159 kg, que se eliminó. También se encontraron
+#valores negativos en Temp_C, Fat_g, Carbs_g, Protein_g y Calories_Consumed. Al ser pocos, se
+#eliminaron esas filas para no introducir ruido. En consistencia se revisaron formatos y categorías
+#y no se hallaron problemas. Además, decidimos eliminar las variables altamente correlacionadas
+#y quedarnos con las que consideramos, resumen mejor la variable correlacionada que se elimina
+#En resumen, las tareas de transformación se decidieron teniendo en cuenta no perder muchos
+#datos, por eso, si muchos datos estaban erróneos, se priorizaba encontrar una forma de
+#arreglarlos. Imputar valores faltantes para preservar los datos, eliminar outliers extremos que
+#dañaran la distribución y descartar registros con valores imposibles para asegurar la validez de
+#los datos. Con estas correcciones se mejora la calidad del dataset y se garantiza que los modelos
+#posteriores trabajen con información coherente y confiable.
+#EXPLORACIÓN DE DATOS
+#UNICIDAD
+#df.duplicated().sum()
+#DEBE VERSE: np.int64(0)
+#COMPLETITUD
+#df.isnull().sum().sort_values(ascending=False)
+#MUESTRA RESULTADOS
+#CONSISTENCIA
+#df.dtypes
+#SALEN RESULTADOS
+#Revisamos los tipo object
+#EJ: df['Gender'].value_counts() -> Gender Male 26438 Female 26334 Other 2228 Name: count, dtype: int64
+#VALIDEZ
+#df.hist(bins=30, figsize=(15, 10))
+#plt.show()
+#SALE GRAFICO
+#df.boxplot()
+#df.describe()
+#SALEN TABLAS
+#numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+#categorical_cols =
+#df.select_dtypes(exclude=[np.number]).columns.tolist()
+#if 'Weight_Change' in numeric_cols:
+#numeric_cols.remove('Weight_Change')
+#percentiles = [0.25, 0.50, 0.75, 0.80, 0.90, 0.95, 0.97, 0.98, 0.99]
+#for col in numeric_cols:
+#print("---------" + col + "---------")
+#print("min:", df[col].min())
+#print("max:", df[col].max())
+#for p in percentiles:
+#print(f"{int(p*100)}%:", df[col].quantile(p))
+# SALEN TABLAS
+#for col in numeric_cols:
+#print ("---------"+col+"--------")
+#print(df[col].describe())
+#SALEN COLS
+
+#COSAS ENCONTRADAS
+#PONER LO QUE LE SALGA A COPILOT PARA QUE DIGA COLUMNAS CON VALORES FALTANTES, VALORES NEGATIVOS, ETC... (exploracion de datos)
+#EJ: cols_negativos = ["Temp_C", "Fat_g", "Carbs_g", "Protein_g", "Calories_Consumed"]
+#conteo_negativos = {}
+#for col in cols_negativos:
+#conteo_negativos[col] = (df[col] < 0).sum()
+#for col, count in conteo_negativos.items():
+#print(f"{col}: {count} valores negativos")
+
+#CORRELACIÓN ENTRE VARIABLES
+#import matplotlib.pyplot as plt
+#import seaborn as sns
+#corr = df.corr(numeric_only=True)
+#plt.figure(figsize=(12,8))
+#sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm", cbar=True)
+#plt.title("Matriz de correlación de variables numéricas", fontsize=14)
+#plt.show()
+#VARIABLES CORRELACIONADAS HACER ANALISIS:
+# EJ: correlación muy alta (0.95). En este caso nos quedamos con Current_Weight_kg, ya que habla mejor del peso final del usuario y es más útil para el análisis de variación de peso.
+# También se ve que Calories_Consumed, Protein_g, Carbs_g y Fat_g están fuertemente correlacionados entre sí. Para evitar multicolinealidad, se puede conservar Calories_Consumed
+#como variable representativa y descartar las demás, o bien aplicar técnicas como PCA si se
+#quiere mantener la información conjunta.
+
+#PIPELINE
+#Con base a los errores identificados, se propone el siguiente PIPELINE
+#cols_to_drop = ["Initial_Weight_kg", "Protein_g", "Carbs_g", "Fat_g"]
+#def drop_columns(X):
+#return X.drop(columns=cols_to_drop)
+#dropper = FunctionTransformer(drop_columns, validate=False)
+#numeric_cols = ["Age","Height_cm","Stress_Level","Sleep_Hours",
+#"Caffeine_mg","Calories_Consumed","Steps",
+#"Workout_Intensity","Temp_C","Current_Weight_kg"]
+#categorical_cols = ["Gender","Workout_Type"]
+#num_imputer = SimpleImputer(strategy="mean")
+#cat_imputer = SimpleImputer(strategy="most_frequent")
+#preprocessor = ColumnTransformer(
+#transformers=[
+#("num", Pipeline([("imputer", num_imputer), ("scaler",
+#StandardScaler())]), numeric_cols),
+#("cat", Pipeline([("imputer", cat_imputer), ("encoder",
+#OneHotEncoder(handle_unknown="ignore"))]), categorical_cols)
+#]
+#)
+#pipeline = Pipeline(steps=[
+#("dropper", dropper),
+#("preprocessor", preprocessor)
+#])
